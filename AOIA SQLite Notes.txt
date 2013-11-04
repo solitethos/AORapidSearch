@@ -1,0 +1,523 @@
+CREATE TABLE tblAO (   
+					[aoid] INTEGER NOT NULL PRIMARY KEY UNIQUE,   
+					[name] TEXT NOT NULL,   
+					[ql] INTEGER NULL,   
+					[type] TEXT NOT NULL,   
+					[description] VARCHAR(256) NULL,   
+					[flags] INTEGER NULL,   
+					[properties] INTEGER NULL,
+					[icon] INTEGER NULL,   
+					[islot] INTEGER NULL   
+				);
+CREATE INDEX tblAO_aoid_idx ON tblAO (aoid);
+CREATE INDEX tblAO_islot_idx ON tblAO (islot);
+CREATE INDEX tblAO_type_idx ON tblAO (type);
+CREATE INDEX tblAO_name_idx ON tblAO (name);
+
+sqlite> SELECT * from tblAO WHERE aoid=21793;
+
+ID		Name						QL	Type  Desc	Flags		Prop	Icon	ISlot
+21793|Augmented Nano Armor Sleeves|200|Armor|[desc].|-1073741821|5|		13231|	640
+124147|OT-Windchaser M06 Quartz|	22|Weapon|[desc]|3|16389|13314|64
+32042|Gender Swap: Female|			7|Misc|[desc]|-2147401728|0|39274|0
+
+Don't matter whatsoever: Description, Flags
+Slot on "Anything" is 63366 - so its a bitwise thing
+
+
+CREATE TABLE tblItemEffects (   [aoid] INTEGER NOT NULL,   
+								[hook] INTEGER,   
+								[type] INTEGER,   
+								[hits] INTEGER,   
+								[delay] INTEGER,   
+								[target] INTEGER,   
+								[value1] INTEGER,   
+								[value2] INTEGER,   
+								[text] TEXT   );
+CREATE INDEX tblItemEffects_aoid_idx ON tblItemEffects (aoid);
+
+Value1 = skill, value2 = amount
+Target: 2 = User, what we want
+Type: 
+
+sqlite> SELECT * from tblItemEffects WHERE aoid=21793;
+21793|14|47|1|0|2|9266|3|	User2	[spell:53039:4]Apply texture #9266 on [E:TextureLocation]Arms3. C=0
+21793|14|53|1|0|2|93|62|	User2	[spell:53045:4](auto)Modify [Stat]Chemical AC93 62
+21793|14|53|1|0|2|95|218|	User2	[spell:53045:4](auto)Modify [Stat]Cold AC95 218
+21793|14|53|1|0|2|92|250|
+21793|14|53|1|0|2|97|218|
+21793|14|53|1|0|2|91|250|
+21793|14|53|1|0|2|96|250|
+21793|14|53|1|0|2|90|218|
+AOID	hook	type	hits	delay	target	value1	value2	text
+21793	|14		|53		|1		|0		|2(self)|94		|218|
+Type 53 = skills, Type 43 = textures
+
+CREATE TABLE tblItemReqs (   [aoid] INTEGER NOT NULL,   
+							[sequence] INTEGER,   
+							[type] INTEGER,   
+							[attribute] INTEGER,   
+							[value] INTEGER,   
+							[operator] INTEGER,
+							[op_modifier] INTEGER   );
+CREATE INDEX tblItemReqs_aoid_idx ON tblItemReqs (aoid);
+
+sqlite> SELECT * from tblItemReqs WHERE aoid=21793;
+aoid		sequence	type		attribute		value		operator	op_mod
+21793		|0			|6			|19				|550		|2			|0
+21793		|1			|6			|21				|500		|2			|4
+
+152544		|1			|6			|4				|4			|0			|4
+156771		|3			|8			|54				|40			|2			|4
+
+sqlite> SELECT * from tblItemReqs WHERE aoid=211232;
+aoid		sequence	type		attribute		value		operator	op_mod
+211232|		0|			8			|389			|2			|22			|0
+211232|		1|			8			|109			|1260		|2			|4
+211232|		2|			8			|112			|840		|2			|4
+
+SELECT * from tblItemReqs WHERE aoid=278957;
+278957|0|6|389|128|22|0		Expansion LoX
+278957|1|6|54|218|2|4		4s are all stat reqs
+278957|2|6|19|1275|2|4
+278957|3|6|21|1275|2|4
+278957|4|6|17|1275|2|4
+278957|5|6|124|2087|2|4
+278957|6|6|60|8|0|0			60 is profession - another 0 op_mod
+278957|7|6|60|3|0|3			3s are OR
+278957|8|6|60|12|0|3
+278957|9|6|60|7|0|7			in this case 7 ends the profession list
+							from my earlier thing, its an AND on a separate line
+
+Attribute is the skill name
+Sequence might not matter?
+
+Type: 6=toWear - have to skip others (3 is toUse)
+
+Attribute: some new "skills" there
+1=Solitus, 2=Opifex, 3=Nanomage, 4=Atrox, 33=Side, 37=TitleLevel, 389=Expansions, 660 AccountFlags
+There are duplicates, so have to pair Attribute with value:
+Faction: 0=Neut, 1=Clan, 2=Omni-Tek
+AccountFlags: 1=Freeplay
+Expansions: Shadowlands(2), AI(8), LostEden(32), LoX(128)
+Profession: 
+Soldier1 MartialArtist2	 Engineer3	Fixer4 Agent5 Adventurer6 Trader7 Bureaucrat8 Enforcer9 Doctor10 NanoTechnician11 MetaPhysicist12 Monster13 Keeper14 Shade15 
+
+Breed4
+Level54
+Profession60
+Expansions389
+GM Level215
+
+sqlite> SELECT DISTINCT operator FROM tblItemReqs;
+0		==
+1		"is not"
+2		>=
+4		(?) only aoid 222836
+18		(?)	only aoid 218842-218851, all health/nano coils
+22		"is"
+24		!=
+31		Wearing
+32		Not Wearing
+33		Wearing
+34		Not Wearing
+35		Owns nano
+36		Doesn't own nano
+44		IsNPC
+45		IsFighting
+66		Have no 4 pets
+70		IsFlying
+85		Same [Stat]Clan5 as the selected target.
+88		UseLocation (?) check aoid 246887 spirit shroud
+91		Running (nano)
+92		Not running
+93		trained (Perk)
+94		locked (perk)
+97		not locked
+101		Not running (nano)
+102		Not running (nano)
+104		SpawnedFromHash
+106		NeedFreeInventorySlots
+107		"not" - can't really figure this one out, on vehicles and QW so maybe flying
+108		Owns108 Bazzit's Alien Library
+109		SpawnItem
+117		Think this is HasQuest
+118		Is own pet
+122		IsBossNpc122
+123		Not in duel.
+124		CanTeleport
+125		HasNotAnythingWorn
+127		Not running (nano)
+136		Allies not in combat.
+
+sqlite> SELECT DISTINCT op_modifier FROM tblItemReqs;
+0		==
+3		OR
+4		AND
+7		These all have AND on a separate line
+19		Only 19 is "self" but that's not an op_mod?
+22		"is" (Expansions, SelectedTargetType)
+23		Showing up on perks but can't find
+26		User26 (not an op_modifier?)
+30		Can't find - mistreatment, personal grid converter
+42		0Self19	Not42 running91Warped Mind
+43		???
+46		??? (on coils)
+58		Only aoid 288359 - don't see it
+62		Only aoid 157084 - don't see it
+84		Seems to be on towers, don't see it
+87		Shield Neutralizers
+110		FightingTarget
+111		NotInVehicle
+116		Flying things
+118		Is own pet
+119		Rechargers
+124		Only 259782
+127		Some grafts, Control Points for BS (???)
+
+// op_mods: 0(==), 3(OR), 7(effectively OR in our case, unless testing proves otherwise)
+
+
+Some slot data:
+
+ItemClass76	[E:ItemClass]Weapon1
+Slot298	[F:WeaponSlot] Hud12			Slot298	[F:WeaponSlot] Bit0, Hud13	
+Slot298	[F:WeaponSlot] Hud34
+Slot298	[F:WeaponSlot] Util18
+Slot298	[F:WeaponSlot] Util216
+Slot298	[F:WeaponSlot] Util332			Slot298	[F:WeaponSlot] Bit0, Util333
+Slot298	[F:WeaponSlot] RightHand64		Slot298	[F:WeaponSlot] Bit0, RightHand65
+Slot298	[F:WeaponSlot] Deck128	(Belt)
+Slot298	[F:WeaponSlot] LeftHand256
+Slot298	[F:WeaponSlot] Bit0, Deck1-2147483135		Hypothetically 512
+Deck2???											Hypothetically 1024
+Slot298	[F:WeaponSlot] Deck32048
+Slot298	[F:WeaponSlot] Deck44096
+Slot298	[F:WeaponSlot] Deck58192
+Slot298	[F:WeaponSlot] Bit0, Deck616385
+Slot298	[F:WeaponSlot] Hud232768		Slot298	[F:WeaponSlot] Bit0, Hud232769
+
+ItemClass76	[E:ItemClass]Armor2
+Slot298	0 None
+Slot298	[F:ArmorSlot] Neck2
+Slot298	[F:ArmorSlot] Head4
+Slot298	[F:ArmorSlot] Back8
+Slot298	[F:ArmorSlot] RightShoulder16
+Slot298	[F:ArmorSlot] Chest32
+Slot298	[F:ArmorSlot] LeftShoulder64
+Slot298	[F:ArmorSlot] RightArm128		Slot298	[F:ArmorSlot] Bit0, RightArm129
+Slot298	[F:ArmorSlot] Hands256
+Slot298	[F:ArmorSlot] LeftArm512
+Slot298	[F:ArmorSlot] RightWrist1024
+Slot298	[F:ArmorSlot] Legs2048
+Slot298	[F:ArmorSlot] LeftWrist4096
+Slot298	[F:ArmorSlot] RightFinger8192
+Slot298	[F:ArmorSlot] Feet16384
+Slot298	[F:ArmorSlot] LeftFinger32768
+
+
+ItemClass76	[E:ItemClass]Implant3
+Slot298	[F:ImplantSlot] Eyes2
+...
+Slot298	[F:ImplantSlot] RightHand1024
+Slot298	[F:ImplantSlot] Legs2048
+Slot298	[F:ImplantSlot] LeftHand4096
+Slot298	[F:ImplantSlot] Feet8192
+
+640 = 512+128	so both arms
+Slot298	[F:ArmorSlot] RightShoulder, LeftShoulder80
+
+
+
+
+Skills:
+            case 93: return "ChemicalAC";
+            case 95: return "ColdAC";
+            case 92: return "EnergyAC";
+            case 97: return "FireAC";
+            case 91: return "MeleeAC";
+            case 96: return "PoisonAC";
+            case 90: return "ProjectileAC";
+            case 94: return "RadiationAC";
+            case 137: return "Adventuring";
+            case 156: return "RunSpeed";
+            case 124: return "Treatment";
+            case 123: return "FirstAid";
+            case 154: return "DodgeRanged";
+            case 153: return "DuckExp";
+            case 155: return "EvadeClsC";
+            case 45: return "BeltSlots";
+            case 181: return "MaxNCU";
+            case 318: return "NPCostModifier";
+            case 360: return "Scale";
+            case 1: return "MaxHealth";
+            case 221: return "MaxNanoEnergy";
+            case 277: return "AddAllDef";
+            case 276: return "AddAllOff";
+            case 319: return "XPModifier";
+            case 278: return "ProjectileDamageModifier";
+            case 281: return "ChemicalDamageModifier";
+            case 282: return "RadiationDamageModifier";
+            case 317: return "PoisonDamageModifier";
+            case 279: return "MeleeDamageModifier";
+            case 280: return "EnergyDamageModifier";
+            case 311: return "ColdDamageModifier";
+            case 316: return "FireDamageModifier";
+            case 136: return "Perception";
+            case 164: return "Concealment";
+            case 226: return "ShieldProjectileAC";
+            case 229: return "ShieldChemicalAC";
+            case 230: return "ShieldRadiationAC";
+            case 234: return "ShieldPoisonAC";
+            case 232: return "ShieldNanoAC";
+            case 227: return "ShieldMeleeAC";
+            case 228: return "ShieldEnergyAC";
+            case 231: return "ShieldColdAC";
+            case 233: return "ShieldFireAC";
+            case 475: return "MaxReflectedProjectileDmg";
+            case 205: return "ReflectProjectileAC";
+            case 208: return "ReflectChemicalAC";
+            case 216: return "ReflectRadiationAC";
+            case 225: return "ReflectPoisonAC";
+            case 478: return "MaxReflectedChemicalDmg";
+            case 479: return "MaxReflectedRadiationDmg";
+            case 483: return "MaxReflectedPoisonDmg";
+            case 481: return "MaxReflectedNanoDmg";
+            case 218: return "ReflectNanoAC";
+            case 476: return "MaxReflectedMeleeDmg";
+            case 206: return "ReflectMeleeAC";
+            case 477: return "MaxReflectedEnergyDmg";
+            case 207: return "ReflectEnergyAC";
+            case 482: return "MaxReflectedFireDmg";
+            case 480: return "MaxReflectedColdDmg";
+            case 219: return "ReflectFireAC";
+            case 217: return "ReflectColdAC";
+            case 380: return "WeaponRange";
+            case 118: return "MeleeInit.";
+            case 119: return "RangedInit.";
+            case 120: return "PhysicalInit.";
+            case 151: return "AimedShot";
+            case 379: return "CriticalIncrease";
+            case 383: return "InterruptModifier";
+            case 381: return "NanoRange";
+            case 149: return "NanoC.Init";
+            case 138: return "Swimming";
+            case 16: return "Strength";
+            case 168: return "NanoResist";
+            case 160: return "NanoProgramming";
+            case 161: return "ComputerLiteracy";
+            case 27: return "Health";
+            case 343: return "HealDelta";
+            case 364: return "NanoDelta";
+            case 108: return "SharpObject";
+            case 101: return "MultiMelee";
+            case 113: return "Rifle";
+            case 135: return "TrapDisarm";
+            case 117: return "VehicleWater";
+            case 139: return "VehicleAir";
+            case 102: return "1hBlunt";
+            case 107: return "2hBlunt";
+            case 142: return "Brawl";
+            case 104: return "MeleeEnergy";
+            case 100: return "MartialArts";
+            case 147: return "FastAttack";
+            case 126: return "ElectricalEngineering";
+            case 140: return "MapNavigation";
+            case 141: return "Tutoring";
+            case 109: return "Grenade";
+            case 110: return "HeavyWeapons";
+            case 122: return "SensoryImprovement";
+            case 125: return "MechanicalEngineering";
+            case 129: return "PsychologicalModification";
+            case 133: return "RangedEnergy";
+            case 157: return "QuantumFT";
+            case 159: return "Pharmaceuticals";
+            case 163: return "Chemistry";
+            case 166: return "VehicleGround";
+            case 19: return "Intelligence";
+            case 111: return "Bow";
+            case 112: return "Pistol";
+            case 116: return "AssaultRifle";
+            case 130: return "MaterialCreation";
+            case 131: return "SpaceTime";
+            case 134: return "MultiRanged";
+            case 146: return "SneakAttack";
+            case 158: return "WeaponSmithing";
+            case 162: return "Psychology";
+            case 121: return "BowSpecialAttack";
+            case 127: return "MaterialMetamorphosis";
+            case 128: return "BiologicalMetamorphosis";
+            case 21: return "Psychic";
+            case 132: return "NanoPool";
+            case 144: return "Dimach";
+            case 20: return "Sense";
+            case 103: return "1hEdged";
+            case 165: return "BreakingEntry";
+            case 167: return "FullAuto";
+            case 148: return "Burst";
+            case 105: return "2hEdged";
+            case 106: return "Piercing";
+            case 114: return "MG/SMG";
+            case 115: return "Shotgun";
+            case 150: return "FlingShot";
+            case 143: return "Riposte";
+            case 145: return "Parry";
+            case 152: return "BodyDevelopment";
+            case 18: return "Stamina";
+            case 17: return "Agility";
+            case 51: return "AggDef";
+            case 26: return "Energy";
+            case 382: return "SkillLockModifier";
+            case 391: return "CritialResistance";
+            case 532: return "ShadowBreed";
+            case 536: return "NanoDamageMultiplier";
+            case 535: return "HealMultiplier";
+            case 593: return "RegainXPPercentage";
+            case 315: return "NanoDamageModifier";
+            case 22: return "AMS";
+            case 659: return "DamageToNano";
+            default: return "Unknown: " + String.valueOf(value);
+			
+			
+			
+http://www.dreamincode.net/forums/topic/157830-using-sqlite-with-c%23/#/
+
+
+
+http://www.xyphos.com/ao/aodb.php?id=
+http://auno.org/ao/db.php?id=
+http://aodb.us/item.php?id=
+https://aoitems.com/item/
+
+
+String[] values = File.ReadAllText(@"ExcludedItems.csv").Split(',');
+ids = new List<uint>();
+foreach(string v in values) {
+	ids.Add(Convert.ToUInt32(v));
+}
+
+
+SELECT DISTINCT value1 FROM tblItemEffects WHERE type=53; < gets all skill IDs
+
+
+Self1	[spell:53045:4](auto)Modify [Stat]Alien Defender Title169
+User2	[spell:53045:4](auto)Modify [Stat]Reset points199
+Target3	[spell:53045:4](auto)Modify [Stat]Aggressiveness201
+User2	[spell:53002:4]Hit [Stat]Nano Points214 for -20000 to -24000.
+
+
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbMeleeAC239 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbProjectileAC238 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbEnergyAC240 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbFireAC244 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbColdAC243 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbChemicalAC241 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbPoisonAC245 to 20000
+User2	[spell:53110:4](auto)Temporarily change [Stat]AbsorbRadiationAC242 to 20000
+Target3	[spell:53045:4](auto)Modify [Stat]MaxDamage285 10
+Target3	[spell:53045:4](auto)Modify [Stat]MinDamage286
+User2	[spell:53162:4](auto)Resist [Mdb:2009]Engineer Pet AOE Snare Buff288 100%
+User2	[spell:53162:4](auto)Resist [Mdb:2009]Engineer Aura-Damage Buff229
+Target3	[spell:53045:4](auto)Modify [Stat]Organization cost302
+User2	[spell:53045:4](auto)Modify [Stat]HealInterval342
+User2	[spell:53045:4](auto)Modify [Stat]NanoInterval363
+User2	[spell:53045:4](auto)Modify [Stat]IsFightingMe410
+User2	[spell:53045:4](auto)Modify [Stat]Direct Nano Damage Vulnerability537
+Self1	[spell:53045:4](auto)Modify [Stat]Sex59
+Self1	[spell:53110:4](auto)Temporarily change [Stat]DamageToNanoMultiplier661 to 150
+
+
+SELECT DISTINCT value1 FROM tblItemEffects INNER JOIN tblItemEffects.aoid=tblAO.aoid AND (tblAO.type='Weapon' OR tblAO.type='Armor' OR tblAO.type='Implant' OR tblAO.type='Spirit');
+
+SELECT DISTINCT value1 FROM tblItemEffects INNER JOIN tblAO ON (tblItemEffects.aoid=tblAO.aoid AND (tblAO.type='Weapon' OR tblAO.type='Armor' OR tblAO.type='Implant' OR tblAO.type='Spirit') AND tblItemEffects.type=53);
+
+SELECT DISTINCT value1,tblItemEffects.aoid FROM tblItemEffects INNER JOIN tblAO ON (tblItemEffects.aoid=tblAO.aoid AND tblAO.type='Spirit' AND tblItemEffects.type=53);
+
+SELECT DISTINCT value1,tblItemEffects.aoid FROM tblItemEffects INNER JOIN tblAO ON (tblItemEffects.aoid=tblAO.aoid AND (tblAO.type='Weapon' OR tblAO.type='Armor' OR tblAO.type='Implant' OR tblAO.type='Spirit') AND tblItemEffects.type=53 AND tblItemEffects.value1=214);
+
+SELECT DISTINCT value1 FROM tblItemEffects INNER JOIN tblAO ON (tblItemEffects.aoid=tblAO.aoid AND (tblAO.type='Weapon' OR tblAO.type='Armor' OR tblAO.type='Implant' OR tblAO.type='Spirit') AND tblItemEffects.type=53 AND tblItemEffects.value1!=214);
+
+
+SELECT * from tblAO INNER JOIN tblItemEffects,tblItemReqs ON (tblAO.type='Armor' or tblAO.type='Weapon' or tblAO.type='Implant' or tblAO.type='Spirit') AND NOT EXISTS(SELECT value1 FROM tblItemEffects WHERE tblItemEffects.aoid=tblAO.aoid AND tblItemEffects.value1=214);
+
+230967 test value
+
+
+4294967246-2,147,483,647 = 2147483599
+
+2147483599 - 2,147,483,647 = -48
+
+4294965296-2,147,483,647 =2147481649
+2147481649 - 2,147,483,647 = -1998
+
+4294967294+2 is the value to get negative numbers
+
+
+XML Schema
+
+http://support.microsoft.com/kb/317662
+
+<db>
+	<item>
+		<aoid>
+		<name>
+		<ql>
+		<type>
+		<icon>
+		<slots>
+		<requirements>
+			<name>
+			<op>
+			<value>
+			<op_mod>
+			<sequence>
+		</requirements>
+		<effects>
+			<skill>
+			<value>
+		</effects>
+	</item>
+</db>
+		
+		
+to Wield8 AND toWear6
+Perform on Wear14
+
+http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlserializer.aspx
+
+
+SELECT * FROM tblItemEffects WHERE aoid=231234 AND hook=14 AND type=53;
+
+
+			switch(name) {
+				case 455: 
+					return false; // Monster stuff
+				case 215: 
+					return false; // GM Level
+				case 59:
+					return false; // Sex (afaik this is never a req on an item that buffs skills)
+			}
+440		
+704
+448 + 168	
+
+
+Boxes = 53x53
+8 pixels horizontally between
+5 vertically
+Icons are 48x48
+
+Horizontally: x1(7) + 53+5? (i.e. 58*n + starting x)
+
+Cant say yet what difference the tabs makes
+
+
+Errors caught so far:
+There are "conditions" on effects, mostly on Maria's fashion items, not sure how to handle those
+
+https://www.dropbox.com/s/shfp8fvws4jvx0m/AORapidSearch%20Beta.rar
+
+<div id="fb-root"></div> <script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "//connect.facebook.net/en_US/all.js#xfbml=1"; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'facebook-jssdk'));</script>
+<div class="fb-post" data-href="https://www.facebook.com/NocturnalFearAO/posts/409429205850933" data-width="550"><div class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/NocturnalFearAO/posts/409429205850933">Post</a> by <a href="https://www.facebook.com/NocturnalFearAO">Nocturnal Fear</a>.</div></div>
+
+SELECT aoid FROM tblAO WHERE instr(name,"Arul Saba") AND NOT instr(name,"Left") AND NOT instr(name,"Right") AND NOT instr(name,"Prototype");

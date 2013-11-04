@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<db>
+	<item>
+		<aoid>211232</aoid>
+		<name>Augmented Ballistic Launcher Pistol</name>
+		<ql>300</ql>
+		<type>Weapon</type>
+		<icon>13311</icon>
+		<slots>320</slots>
+		<requirement>
+			<name>112</name>
+			<op>2</op>
+			<value>841</value>
+			<op_mod>4</op_mod>
+			<sequence>2</sequence>
+		</requirement>
+		<requirement>
+			<name>109</name>
+			<op>2</op>
+			<value>1261</value>
+			<op_mod>4</op_mod>
+			<sequence>1</sequence>
+		</requirement>
+		<requirement>
+			<name>389</name>
+			<op>22</op>
+			<value>2</value>
+			<op_mod>0</op_mod>
+			<sequence>0</sequence>
+		<effect>
+			<skill>153</skill>
+			<value>30</value>
+		</effect>
+		<effect>
+			<skill>130</skill>
+			<value>3</value>
+		</effect>
+		<effect>
+			<skill>131</skill>
+			<value>3</value>
+		</effect>
+	</item>
+</db>
