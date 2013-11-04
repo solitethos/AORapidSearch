@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>AORapidSearch by solitethos</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>AORapidSearch</h1>
+        <p>A tool that rapidly searches the Anarchy Online database for buffing items!</p>
+
+        <p class="view"><a href="https://github.com/solitethos/AORapidSearch">View the Project on GitHub <small>solitethos/AORapidSearch</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/solitethos/AORapidSearch/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/solitethos/AORapidSearch/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/solitethos/AORapidSearch">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="aorapidsearch" class="anchor" href="#aorapidsearch"><span class="octicon octicon-link"></span></a>AORapidSearch</h1>
+
+<p>By Trypha</p>
+
+<pre><code>Homepage: https://code.google.com/p/aorapidsearch/
+Download link: https://www.dropbox.com/s/shfp8fvws4jvx0m/AORapidSearch%20Beta.rar
+</code></pre>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation:</h2>
+
+<p>Unrar (use your favorite rar program, like WinRAR from rarlab.com) to any location on your drive.</p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage:</h2>
+
+<p>On execution, AORapidSearch (AORS) will load its item database, which may take a few seconds. The "Search" button will activate when loading finishes. Select your desired breed, profession, faction, level, expansions, and the skill you want to buff and hit Search.</p>
+
+<p>AORS will generate results and populate whatever slots it finds an item for. The item with the highest buff will be automatically selected. To see what else is available, right click the slot and choose one of the other items, if there are more for that slot. Double clicking an item will launch one of the AO database web pages (AOItems.com by default) for that item.</p>
+
+<p>You must be aware of certain provisos for this tool, and they reflect a cardinal rule:</p>
+
+<ul>
+<li>THIS TOOL DOES NOT REPLACE COMPREHENSIVE GAME KNOWLEDGE. IT MERELY SPEEDS UP SEARCHES AND KEEPS YOU FROM FORGETTING ABOUT CRITICAL ITEMS. -</li>
+</ul><ol>
+<li>Some items are unique, and only one such item can be equipped at a time. AORS will display that item in whatever slots it can be equipped in. It is left to you both to know which items are unique and to pick which slot is best for that item. </li>
+<li>Some items cannot be equipped by certain characters for reasons other than skill requirements. For example, some Zodiac loot will appear to be equippable by free characters, and items from the LoX expansion will appear equippable by level 200 characters, despite the fact that these characters can never enter the zones to loot those items. Again, it is left to you to know the game well enough to determine this.</li>
+<li>A skill might in some cases be buffed more by trickle, but AORS will not calculate trickle. You will have to run separate searches for ability boosting items and determine which will work better for your needs. </li>
+<li>As of now, AORS does not search for perks, nanos, or org benefits. I may implement this in the future.</li>
+</ol><h2>
+<a name="advanced-features" class="anchor" href="#advanced-features"><span class="octicon octicon-link"></span></a>Advanced Features:</h2>
+
+<ol>
+<li>File-&gt;Update DB will update the database. The database and icon set included with this installation is generated from the 18.6.9 database. I have attempted to make the database upgrade procedure as smooth as possible, but I admit it is far from user-friendly at this point. You will need a working, updated installation of Anarchy Online Item Assistant and AOSkills3 (links in Acknowledgements). Perform the steps in order, and read carefully.</li>
+<li>Options: These should be mostly self-explanatory. The Custom DB site option is provided in case someone creates a new database site in the future. Load the page for an item, copy the URL minus the AOID into the box.</li>
+<li>Advanced-&gt;Excluded Items: if you get frustrated by items showing up that you know to be not ingame, or items that you will never acquire, you can add them to a list by AOID and they will be excluded from searches. If you change your mind, you can remove them from the list. You can also import a comma-separated-value list (a plain text file of AOIDs separated by commas, no spaces or newlines) to save time.</li>
+<li>Advanced-&gt;Custom Skills: You should never need this option unless Funcom changes the game drastically. It is provided merely for the sake of extra future-proofing flexibility.</li>
+</ol><h2>
+<a name="known-issues" class="anchor" href="#known-issues"><span class="octicon octicon-link"></span></a>Known Issues:</h2>
+
+<ol>
+<li>Some items have conditional stats, such as Maria's Fashion items, which only work when certain conditions are met, and AORS does not detect this yet. For example, the Yellow Tank Top of Sirillion buffs Complit for Bureaucrats only, but will show up in AORS for all professions.</li>
+</ol><p>Awaiting bug reports from testers.
+For bug reports, PM Trypha on the official forums.</p>
+
+<h2>
+<a name="acknowledgements" class="anchor" href="#acknowledgements"><span class="octicon octicon-link"></span></a>Acknowledgements:</h2>
+
+<p>Program icon borrowed from Docaholic (<a href="http://forums.anarchy-online.com/showpost.php?p=6053472&amp;postcount=10">http://forums.anarchy-online.com/showpost.php?p=6053472&amp;postcount=10</a>).
+Concept, GUI design and some code borrowed from Zacix's AOTwinker (<a href="http://aotwinker.codeplex.com/">http://aotwinker.codeplex.com/</a>, now abandoned).
+Icons extracted with Darkbane's ExtractIcons tool, bundled with AOSkills3 (<a href="http://www.lastmanut.pwp.blueyonder.co.uk/AOSkills3CP2WebPage/aoskills3.html">http://www.lastmanut.pwp.blueyonder.co.uk/AOSkills3CP2WebPage/aoskills3.html</a>).
+SQL database provided by Morten Fjeldstad's Anarchy Online Item Assistant Plus (<a href="http://sourceforge.net/projects/aoiaplus/">http://sourceforge.net/projects/aoiaplus/</a>).</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/solitethos">solitethos</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
